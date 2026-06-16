@@ -30,7 +30,10 @@ export const darkColors = {
   success: '#66BB6A',
   danger: '#EF5350',
   warning: '#FFA726',
-  white: '#1E1E1E',
+  // Stays true white in both themes — used as a fixed foreground color
+  // (icons/text) on top of colored buttons and the header, not as a
+  // surface background (that's colors.surface).
+  white: '#FFFFFF',
   black: '#000000',
 };
 
