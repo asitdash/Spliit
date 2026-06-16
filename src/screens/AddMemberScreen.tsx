@@ -129,8 +129,8 @@ export default function AddMemberScreen({ navigation, route }: Props) {
         const guest: AppUser = {
           id,
           displayName: contact.name,
-          phone: contact.phone,
-          email: contact.email,
+          ...(contact.phone ? { phone: contact.phone } : {}),
+          ...(contact.email ? { email: contact.email } : {}),
         };
         await addMemberToGroup(groupId, guest);
         Alert.alert(
