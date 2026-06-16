@@ -41,6 +41,15 @@ module.exports = {
       "expo-status-bar",
       "expo-secure-store",
       [
+        "expo-build-properties",
+        {
+          android: {
+            enableProguardInReleaseBuilds: false,
+            enableShrinkResourcesInReleaseBuilds: false,
+          },
+        },
+      ],
+      [
         "expo-contacts",
         {
           contactsPermission: "Allow SPLIIT to access your contacts to add group members.",
