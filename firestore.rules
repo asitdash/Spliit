@@ -11,7 +11,7 @@ service cloud.firestore {
     // Groups: only members can read/write; any logged-in user can create
     match /groups/{groupId} {
       allow create: if request.auth != null;
-      allow read, update: if request.auth.uid in resource.data.members;
+      allow read, update, delete: if request.auth.uid in resource.data.members;
 
       // Expenses subcollection: only group members can read/write
       match /expenses/{expenseId} {
