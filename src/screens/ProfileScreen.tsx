@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   isBiometricHardwareAvailable,
   isBiometricEnabled,
@@ -11,10 +12,12 @@ import {
   getBiometricType,
   getStoredCredentials,
 } from '../services/biometricService';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 export default function ProfileScreen() {
   const { appUser, logout } = useAuth();
+  const { colors, isDark, toggleTheme } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricType, setBiometricType] = useState('Fingerprint');
@@ -83,6 +86,25 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Appearance</Text>
+        <View style={styles.row}>
+          <View style={styles.rowLeft}>
+            <Ionicons name={isDark ? 'moon' : 'sunny-outline'} size={22} color={colors.primary} />
+            <View>
+              <Text style={styles.rowText}>Dark Mode</Text>
+              <Text style={styles.rowSubText}>{isDark ? 'On' : 'Off'}</Text>
+            </View>
+          </View>
+          <Switch
+            value={isDark}
+            onValueChange={toggleTheme}
+            trackColor={{ false: colors.border, true: colors.primaryLight }}
+            thumbColor={isDark ? colors.primary : colors.textMuted}
+          />
+        </View>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionLabel}>Security</Text>
 
         {biometricAvailable ? (
@@ -128,60 +150,62 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  avatarBox: {
-    alignItems: 'center',
-    padding: spacing.xl,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: radius.full,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  avatarText: { fontSize: fontSize.xxxl, fontWeight: '900', color: colors.primary },
-  name: { fontSize: fontSize.xl, fontWeight: '700', color: colors.textPrimary },
-  meta: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 4 },
-  section: {
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
-    marginHorizontal: spacing.md,
-    marginTop: spacing.md,
-    overflow: 'hidden',
-  },
-  sectionLabel: {
-    fontSize: fontSize.xs,
-    fontWeight: '700',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 },
-  rowText: { fontSize: fontSize.md, fontWeight: '600', color: colors.textPrimary },
-  rowSubText: { fontSize: fontSize.xs, color: colors.textSecondary, marginTop: 2 },
-  version: {
-    textAlign: 'center',
-    fontSize: fontSize.xs,
-    color: colors.textMuted,
-    marginTop: 'auto',
-    padding: spacing.lg,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    avatarBox: {
+      alignItems: 'center',
+      padding: spacing.xl,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    avatar: {
+      width: 80,
+      height: 80,
+      borderRadius: radius.full,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+    },
+    avatarText: { fontSize: fontSize.xxxl, fontWeight: '900', color: colors.primary },
+    name: { fontSize: fontSize.xl, fontWeight: '700', color: colors.textPrimary },
+    meta: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 4 },
+    section: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      marginHorizontal: spacing.md,
+      marginTop: spacing.md,
+      overflow: 'hidden',
+    },
+    sectionLabel: {
+      fontSize: fontSize.xs,
+      fontWeight: '700',
+      color: colors.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.xs,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    rowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 },
+    rowText: { fontSize: fontSize.md, fontWeight: '600', color: colors.textPrimary },
+    rowSubText: { fontSize: fontSize.xs, color: colors.textSecondary, marginTop: 2 },
+    version: {
+      textAlign: 'center',
+      fontSize: fontSize.xs,
+      color: colors.textMuted,
+      marginTop: 'auto',
+      padding: spacing.lg,
+    },
+  });
+}

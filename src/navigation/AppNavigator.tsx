@@ -1,10 +1,11 @@
 import React from 'react';
 import { ActivityIndicator, View, Image, Text, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { RootStackParamList } from '../types';
-import { colors } from '../theme';
+import { ThemeColors } from '../theme';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
@@ -23,7 +24,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function HomeHeaderTitle() {
+function HomeHeaderTitle({ colors }: { colors: ThemeColors }) {
+  const headerStyles = createHeaderStyles(colors);
   return (
     <View style={headerStyles.row}>
       <Image source={require('../../assets/android-icon-foreground.png')} style={headerStyles.logo} />
@@ -32,25 +34,40 @@ function HomeHeaderTitle() {
   );
 }
 
-const headerStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logo: { width: 28, height: 28, resizeMode: 'contain' },
-  title: { color: colors.white, fontSize: 18, fontWeight: '700' },
-});
+function createHeaderStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    logo: { width: 28, height: 28, resizeMode: 'contain' },
+    title: { color: colors.white, fontSize: 18, fontWeight: '700' },
+  });
+}
 
 export default function AppNavigator() {
   const { user, appUser, loading } = useAuth();
+  const { colors, isDark } = useTheme();
+
+  const navTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      background: colors.background,
+      card: colors.surface,
+      text: colors.textPrimary,
+      border: colors.border,
+      primary: colors.primary,
+    },
+  };
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navTheme}>
       <Stack.Navigator
         screenOptions={{
           headerStyle: { backgroundColor: colors.primary },
@@ -69,7 +86,7 @@ export default function AppNavigator() {
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={{ headerTitle: () => <HomeHeaderTitle />, headerBackVisible: false }}
+              options={{ headerTitle: () => <HomeHeaderTitle colors={colors} />, headerBackVisible: false }}
             />
             <Stack.Screen name="CreateGroup" component={CreateGroupScreen} options={{ title: 'New Group' }} />
             <Stack.Screen

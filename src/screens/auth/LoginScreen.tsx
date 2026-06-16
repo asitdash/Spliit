@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   isBiometricHardwareAvailable,
   isBiometricEnabled,
@@ -27,7 +28,7 @@ import {
   getBiometricType,
 } from '../../services/biometricService';
 import { RootStackParamList } from '../../types';
-import { colors, spacing, fontSize, radius } from '../../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -35,6 +36,8 @@ type Props = {
 
 export default function LoginScreen({ navigation }: Props) {
   const { signIn } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -256,14 +259,15 @@ export default function LoginScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.primary },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg },
   header: { alignItems: 'center', marginBottom: spacing.xl },
   logo: { fontSize: 42, fontWeight: '900', color: colors.white, letterSpacing: 4 },
   tagline: { fontSize: fontSize.md, color: 'rgba(255,255,255,0.8)', marginTop: spacing.xs },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.lg,
     shadowColor: '#000',
@@ -320,7 +324,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   modalCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.xl,
     alignItems: 'center',
@@ -353,4 +357,5 @@ const styles = StyleSheet.create({
   modalPrimaryBtnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
   modalSecondaryBtn: { padding: spacing.sm },
   modalSecondaryBtnText: { color: colors.textSecondary, fontSize: fontSize.sm },
-});
+  });
+}

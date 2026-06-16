@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -18,13 +18,16 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../../config/firebase';
 import { RootStackParamList } from '../../types';
-import { colors, spacing, fontSize, radius } from '../../theme';
+import { useTheme } from '../../contexts/ThemeContext';
+import { spacing, fontSize, radius, ThemeColors } from '../../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 };
 
 export default function ForgotPasswordScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -120,7 +123,8 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { flexGrow: 1, padding: spacing.lg, paddingTop: spacing.xl * 2, alignItems: 'center' },
   icon: { marginBottom: spacing.md },
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     fontSize: fontSize.md,
     color: colors.textPrimary,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     marginBottom: spacing.md,
   },
   btn: {
@@ -197,4 +201,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   backBtnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
-});
+  });
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -15,14 +15,17 @@ import {
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { RootStackParamList } from '../../types';
-import { colors, spacing, fontSize, radius } from '../../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
 };
 
 export default function RegisterScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { signUp } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -128,34 +131,36 @@ export default function RegisterScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flexGrow: 1, padding: spacing.lg },
-  subtitle: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-    backgroundColor: colors.white,
-  },
-  btn: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginTop: spacing.sm,
-  },
-  btnDisabled: { opacity: 0.7 },
-  btnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
-  linkRow: { marginTop: spacing.lg, alignItems: 'center' },
-  linkText: { color: colors.textSecondary, fontSize: fontSize.sm },
-  link: { color: colors.primary, fontWeight: '700' },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    scroll: { flexGrow: 1, padding: spacing.lg },
+    subtitle: {
+      fontSize: fontSize.md,
+      color: colors.textSecondary,
+      marginBottom: spacing.lg,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      fontSize: fontSize.md,
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+      backgroundColor: colors.surface,
+    },
+    btn: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      alignItems: 'center',
+      marginTop: spacing.sm,
+    },
+    btnDisabled: { opacity: 0.7 },
+    btnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
+    linkRow: { marginTop: spacing.lg, alignItems: 'center' },
+    linkText: { color: colors.textSecondary, fontSize: fontSize.sm },
+    link: { color: colors.primary, fontWeight: '700' },
+  });
+}

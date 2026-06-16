@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,9 @@ import { getExpenses } from '../services/expenseService';
 import { getGroup } from '../services/groupService';
 import { formatCurrency } from '../utils/calculations';
 import { Expense, AppUser, RootStackParamList } from '../types';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 type Props = {
   route: RouteProp<RootStackParamList, 'Analytics'>;
@@ -37,16 +38,18 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Other':         '#FFB347',
 };
 
-const CHART_CONFIG = {
-  backgroundGradientFrom: '#ffffff',
-  backgroundGradientTo: '#ffffff',
-  color: (opacity = 1) => `rgba(92, 107, 192, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(117, 117, 117, ${opacity})`,
-  strokeWidth: 2,
-  barPercentage: 0.65,
-  propsForDots: { r: '4', strokeWidth: '2', stroke: colors.primary },
-  decimalPlaces: 0,
-};
+function getChartConfig(colors: ThemeColors) {
+  return {
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(92, 107, 192, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(117, 117, 117, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.65,
+    propsForDots: { r: '4', strokeWidth: '2', stroke: colors.primary },
+    decimalPlaces: 0,
+  };
+}
 
 interface CategoryData {
   name: string;
@@ -67,6 +70,9 @@ interface MemberData {
 }
 
 export default function AnalyticsScreen({ route }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const CHART_CONFIG = useMemo(() => getChartConfig(colors), [colors]);
   const { groupId, currency } = route.params;
   const { appUser } = useAuth();
 
@@ -333,75 +339,77 @@ export default function AnalyticsScreen({ route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
-  emptyTitle: { fontSize: fontSize.lg, fontWeight: '700', color: colors.textPrimary, marginTop: spacing.md },
-  emptyText: { fontSize: fontSize.sm, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs },
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.lg },
+    centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+    emptyTitle: { fontSize: fontSize.lg, fontWeight: '700', color: colors.textPrimary, marginTop: spacing.md },
+    emptyText: { fontSize: fontSize.sm, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs },
 
-  summaryRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
-  summaryCard: {
-    flex: 1,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  summaryValue: { fontSize: fontSize.sm, fontWeight: '800', color: colors.white },
-  summaryLabel: { fontSize: fontSize.xs, color: 'rgba(255,255,255,0.85)', textAlign: 'center' },
+    summaryRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
+    summaryCard: {
+      flex: 1,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      alignItems: 'center',
+      gap: spacing.xs,
+    },
+    summaryValue: { fontSize: fontSize.sm, fontWeight: '800', color: colors.white },
+    summaryLabel: { fontSize: fontSize.xs, color: 'rgba(255,255,255,0.85)', textAlign: 'center' },
 
-  section: {
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: fontSize.md,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  chart: { borderRadius: radius.md, marginLeft: -spacing.md },
+    section: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    sectionTitle: {
+      fontSize: fontSize.md,
+      fontWeight: '700',
+      color: colors.textPrimary,
+      marginBottom: spacing.md,
+    },
+    chart: { borderRadius: radius.md, marginLeft: -spacing.md },
 
-  categoryList: { marginTop: spacing.sm },
-  categoryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  categoryDot: { width: 10, height: 10, borderRadius: 5, marginRight: spacing.sm },
-  categoryName: { flex: 1, fontSize: fontSize.sm, color: colors.textPrimary },
-  categoryAmount: { fontSize: fontSize.sm, fontWeight: '700', color: colors.textPrimary, marginRight: spacing.sm },
-  categoryPct: { fontSize: fontSize.xs, color: colors.textSecondary, width: 35, textAlign: 'right' },
+    categoryList: { marginTop: spacing.sm },
+    categoryRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.xs,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    categoryDot: { width: 10, height: 10, borderRadius: 5, marginRight: spacing.sm },
+    categoryName: { flex: 1, fontSize: fontSize.sm, color: colors.textPrimary },
+    categoryAmount: { fontSize: fontSize.sm, fontWeight: '700', color: colors.textPrimary, marginRight: spacing.sm },
+    categoryPct: { fontSize: fontSize.xs, color: colors.textSecondary, width: 35, textAlign: 'right' },
 
-  memberList: { marginTop: spacing.sm },
-  memberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  memberRank: {
-    width: 24,
-    height: 24,
-    borderRadius: radius.full,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  memberRankText: { fontSize: fontSize.xs, fontWeight: '800', color: colors.primary },
-  memberName: { flex: 1, fontSize: fontSize.sm, color: colors.textPrimary },
-  memberPaid: { fontSize: fontSize.sm, fontWeight: '700', color: colors.textPrimary, marginRight: spacing.sm },
-  memberPct: { fontSize: fontSize.xs, color: colors.textSecondary, width: 35, textAlign: 'right' },
-});
+    memberList: { marginTop: spacing.sm },
+    memberRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.xs,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    memberRank: {
+      width: 24,
+      height: 24,
+      borderRadius: radius.full,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.sm,
+    },
+    memberRankText: { fontSize: fontSize.xs, fontWeight: '800', color: colors.primary },
+    memberName: { flex: 1, fontSize: fontSize.sm, color: colors.textPrimary },
+    memberPaid: { fontSize: fontSize.sm, fontWeight: '700', color: colors.textPrimary, marginRight: spacing.sm },
+    memberPct: { fontSize: fontSize.xs, color: colors.textSecondary, width: 35, textAlign: 'right' },
+  });
+}

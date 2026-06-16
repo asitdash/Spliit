@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -17,11 +17,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { updateExpense } from '../services/expenseService';
 import { uploadReceipt } from '../services/storageService';
 import { AppUser, Split, RootStackParamList } from '../types';
 import { formatCurrency } from '../utils/calculations';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'EditExpense'>;
@@ -44,6 +45,8 @@ const CATEGORIES = [
 export default function EditExpenseScreen({ navigation, route }: Props) {
   const { groupId, expense, members, currency } = route.params;
   const { appUser } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [description, setDescription] = useState(expense.description);
   const [amount, setAmount] = useState(String(expense.amount));
@@ -296,7 +299,8 @@ export default function EditExpenseScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.lg, paddingBottom: 40 },
   label: {
@@ -315,7 +319,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     fontSize: fontSize.md,
     color: colors.textPrimary,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
   },
   amountInput: { fontSize: fontSize.xxl, fontWeight: '700', textAlign: 'center', padding: spacing.lg },
   categoryScroll: { marginBottom: spacing.xs },
@@ -327,7 +331,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1.5,
     borderColor: colors.border,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     minWidth: 80,
   },
   catChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
@@ -341,7 +345,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     borderWidth: 1.5,
     borderColor: colors.border,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
   },
   chipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
   chipText: { fontSize: fontSize.sm, color: colors.textSecondary, fontWeight: '600' },
@@ -357,12 +361,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1.5,
     borderColor: colors.border,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
   },
   splitModeBtnActive: { borderColor: colors.primary, backgroundColor: colors.primary },
   splitModeBtnText: { fontSize: fontSize.sm, fontWeight: '600', color: colors.textSecondary },
   splitModeBtnTextActive: { color: colors.white },
-  previewBox: { backgroundColor: colors.white, borderRadius: radius.md, padding: spacing.md, marginTop: spacing.xs },
+  previewBox: { backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.md, marginTop: spacing.xs },
   splitRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
   splitName: { fontSize: fontSize.md, color: colors.textPrimary },
   splitAmount: { fontSize: fontSize.md, fontWeight: '700', color: colors.primary },
@@ -390,7 +394,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
     justifyContent: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
   },
   receiptBtnText: { color: colors.primary, fontWeight: '600', fontSize: fontSize.sm },
   receiptPreviewBox: { position: 'relative', borderRadius: radius.md, overflow: 'hidden' },
@@ -412,4 +416,5 @@ const styles = StyleSheet.create({
   },
   saveBtnDisabled: { opacity: 0.7 },
   saveBtnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
-});
+  });
+}

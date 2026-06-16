@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -15,11 +15,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { subscribeToGroup, deleteGroup } from '../services/groupService';
 import { subscribeToExpenses, deleteExpense } from '../services/expenseService';
 import { calculateBalances, calculateSettlements, formatCurrency } from '../utils/calculations';
 import { Group, Expense, Balance, Settlement, AppUser, RootStackParamList } from '../types';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'GroupDetail'>;
@@ -31,6 +32,8 @@ type Tab = 'expenses' | 'balances';
 export default function GroupDetailScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
   const { appUser } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [group, setGroup] = useState<Group | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [balances, setBalances] = useState<Balance[]>([]);
@@ -401,11 +404,12 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   tabs: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -428,7 +432,7 @@ const styles = StyleSheet.create({
   expenseCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -460,7 +464,7 @@ const styles = StyleSheet.create({
   balanceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -478,7 +482,7 @@ const styles = StyleSheet.create({
   balanceName: { flex: 1, fontSize: fontSize.md, fontWeight: '600', color: colors.textPrimary },
   balanceAmount: { fontSize: fontSize.sm, fontWeight: '600' },
   settlementsSection: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -518,7 +522,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   menuSheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: radius.lg,
     borderTopRightRadius: radius.lg,
     paddingBottom: 32,
@@ -571,4 +575,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
-});
+  });
+}

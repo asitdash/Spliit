@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -10,15 +10,18 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { subscribeToUserGroups } from '../services/groupService';
 import { Group, RootStackParamList } from '../types';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
 export default function HomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { appUser, logout } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,57 +119,59 @@ export default function HomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  greetRow: { padding: spacing.lg, paddingBottom: spacing.sm },
-  greet: { fontSize: fontSize.lg, fontWeight: '700', color: colors.textPrimary },
-  greetSub: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 2 },
-  list: { padding: spacing.md, paddingTop: spacing.sm },
-  empty: { flex: 1 },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  groupIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: radius.full,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  groupIconText: { fontSize: fontSize.lg, fontWeight: '800', color: colors.primary },
-  groupInfo: { flex: 1 },
-  groupName: { fontSize: fontSize.md, fontWeight: '700', color: colors.textPrimary },
-  groupMeta: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 2 },
-  groupDesc: { fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
-  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
-  emptyTitle: { fontSize: fontSize.lg, fontWeight: '700', color: colors.textPrimary, marginTop: spacing.md },
-  emptyText: { fontSize: fontSize.sm, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.sm },
-  fab: {
-    position: 'absolute',
-    bottom: 28,
-    right: 24,
-    width: 60,
-    height: 60,
-    borderRadius: radius.full,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    greetRow: { padding: spacing.lg, paddingBottom: spacing.sm },
+    greet: { fontSize: fontSize.lg, fontWeight: '700', color: colors.textPrimary },
+    greetSub: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 2 },
+    list: { padding: spacing.md, paddingTop: spacing.sm },
+    empty: { flex: 1 },
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    groupIcon: {
+      width: 46,
+      height: 46,
+      borderRadius: radius.full,
+      backgroundColor: colors.primaryLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing.md,
+    },
+    groupIconText: { fontSize: fontSize.lg, fontWeight: '800', color: colors.primary },
+    groupInfo: { flex: 1 },
+    groupName: { fontSize: fontSize.md, fontWeight: '700', color: colors.textPrimary },
+    groupMeta: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: 2 },
+    groupDesc: { fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
+    emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+    emptyTitle: { fontSize: fontSize.lg, fontWeight: '700', color: colors.textPrimary, marginTop: spacing.md },
+    emptyText: { fontSize: fontSize.sm, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.sm },
+    fab: {
+      position: 'absolute',
+      bottom: 28,
+      right: 24,
+      width: 60,
+      height: 60,
+      borderRadius: radius.full,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.4,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+  });
+}

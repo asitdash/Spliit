@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,10 @@ import {
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { createGroup } from '../services/groupService';
 import { RootStackParamList } from '../types';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'CreateGroup'>;
@@ -24,6 +25,8 @@ type Props = {
 const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD'];
 
 export default function CreateGroupScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { appUser } = useAuth();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -101,47 +104,49 @@ export default function CreateGroupScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg },
-  label: {
-    fontSize: fontSize.sm,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-    marginTop: spacing.md,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-    backgroundColor: colors.white,
-  },
-  textarea: { height: 80 },
-  currencyRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.xs },
-  currencyChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.full,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.white,
-  },
-  currencyChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  currencyText: { fontSize: fontSize.sm, color: colors.textSecondary, fontWeight: '600' },
-  currencyTextActive: { color: colors.primary },
-  btn: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginTop: spacing.xl,
-  },
-  btnDisabled: { opacity: 0.7 },
-  btnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { padding: spacing.lg },
+    label: {
+      fontSize: fontSize.sm,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      marginBottom: spacing.xs,
+      marginTop: spacing.md,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      fontSize: fontSize.md,
+      color: colors.textPrimary,
+      backgroundColor: colors.surface,
+    },
+    textarea: { height: 80 },
+    currencyRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.xs },
+    currencyChip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.full,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    currencyChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+    currencyText: { fontSize: fontSize.sm, color: colors.textSecondary, fontWeight: '600' },
+    currencyTextActive: { color: colors.primary },
+    btn: {
+      backgroundColor: colors.primary,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      alignItems: 'center',
+      marginTop: spacing.xl,
+    },
+    btnDisabled: { opacity: 0.7 },
+    btnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.md },
+  });
+}

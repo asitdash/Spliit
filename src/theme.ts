@@ -1,4 +1,4 @@
-export const colors = {
+export const lightColors = {
   primary: '#5C6BC0',
   primaryDark: '#3949AB',
   primaryLight: '#E8EAF6',
@@ -15,6 +15,29 @@ export const colors = {
   white: '#FFFFFF',
   black: '#000000',
 };
+
+export const darkColors = {
+  primary: '#7C8AE0',
+  primaryDark: '#5C6BC0',
+  primaryLight: '#2A2F4A',
+  accent: '#FF8A65',
+  background: '#121212',
+  surface: '#1E1E1E',
+  textPrimary: '#F5F5F5',
+  textSecondary: '#B0B0B0',
+  textMuted: '#6E6E6E',
+  border: '#333333',
+  success: '#66BB6A',
+  danger: '#EF5350',
+  warning: '#FFA726',
+  white: '#1E1E1E',
+  black: '#000000',
+};
+
+export type ThemeColors = typeof lightColors;
+
+// Kept for any leftover static imports — defaults to light palette.
+export const colors = lightColors;
 
 export const spacing = {
   xs: 4,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,8 @@ import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { findUserByEmail, findUserByPhone, addMemberToGroup } from '../services/groupService';
 import { AppUser, RootStackParamList } from '../types';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddMember'>;
@@ -40,6 +41,8 @@ function normalizePhone(phone: string): string {
 
 export default function AddMemberScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [tab, setTab] = useState<Tab>('contacts');
 
   // --- Contacts tab ---
@@ -384,13 +387,14 @@ export default function AddMemberScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
 
   // Tabs
   tabs: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -412,7 +416,7 @@ const styles = StyleSheet.create({
   filterRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     margin: spacing.md,
     paddingHorizontal: spacing.md,
@@ -437,7 +441,7 @@ const styles = StyleSheet.create({
   contactRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
     borderBottomWidth: 1,
@@ -484,7 +488,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     fontSize: fontSize.md,
     color: colors.textPrimary,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
   },
   searchBtn: {
     backgroundColor: colors.primary,
@@ -498,7 +502,7 @@ const styles = StyleSheet.create({
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginTop: spacing.lg,
@@ -519,4 +523,5 @@ const styles = StyleSheet.create({
   },
   addBtnDisabled: { opacity: 0.7 },
   addBtnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.sm },
-});
+  });
+}

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { subscribeToGroup, removeMemberFromGroup } from '../services/groupService';
 import { AppUser, Group, RootStackParamList } from '../types';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Members'>;
@@ -16,6 +17,8 @@ type Props = {
 export default function GroupMembersScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
   const { appUser } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [group, setGroup] = useState<Group | null>(null);
 
   React.useEffect(() => {
@@ -98,7 +101,8 @@ export default function GroupMembersScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   addBtn: {
     flexDirection: 'row',
@@ -111,14 +115,14 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.primary,
     borderStyle: 'dashed',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
   },
   addBtnText: { color: colors.primary, fontWeight: '600', fontSize: fontSize.sm },
   listContent: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -137,4 +141,5 @@ const styles = StyleSheet.create({
   name: { fontSize: fontSize.md, fontWeight: '600', color: colors.textPrimary },
   meta: { fontSize: fontSize.xs, color: colors.textSecondary, marginTop: 2 },
   removeBtn: { padding: spacing.xs },
-});
+  });
+}

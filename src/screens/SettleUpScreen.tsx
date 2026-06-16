@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,8 @@ import { subscribeToExpenses, addExpense } from '../services/expenseService';
 import { calculateBalances, calculateSettlements, formatCurrency } from '../utils/calculations';
 import { Settlement, RootStackParamList } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { colors, spacing, fontSize, radius } from '../theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { spacing, fontSize, radius, ThemeColors } from '../theme';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'SettleUp'>;
@@ -25,6 +26,8 @@ type Props = {
 export default function SettleUpScreen({ navigation, route }: Props) {
   const { groupId, members, currency } = route.params;
   const { appUser } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);
   const [settling, setSettling] = useState<string | null>(null);
@@ -187,7 +190,8 @@ export default function SettleUpScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
   allClearTitle: { fontSize: fontSize.xl, fontWeight: '700', color: colors.textPrimary, marginTop: spacing.md },
   allClearText: { fontSize: fontSize.sm, color: colors.textSecondary, marginTop: spacing.xs },
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -249,4 +253,5 @@ const styles = StyleSheet.create({
   },
   settleBtnDisabled: { opacity: 0.7 },
   settleBtnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.sm },
-});
+  });
+}
