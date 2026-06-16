@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Image, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,6 +22,21 @@ import EditExpenseScreen from '../screens/EditExpenseScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+function HomeHeaderTitle() {
+  return (
+    <View style={headerStyles.row}>
+      <Image source={require('../../assets/android-icon-foreground.png')} style={headerStyles.logo} />
+      <Text style={headerStyles.title}>SPLIIT</Text>
+    </View>
+  );
+}
+
+const headerStyles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logo: { width: 28, height: 28, resizeMode: 'contain' },
+  title: { color: colors.white, fontSize: 18, fontWeight: '700' },
+});
 
 export default function AppNavigator() {
   const { user, appUser, loading } = useAuth();
@@ -51,7 +66,11 @@ export default function AppNavigator() {
           </>
         ) : (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'SPLIIT', headerBackVisible: false }} />
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={{ headerTitle: () => <HomeHeaderTitle />, headerBackVisible: false }}
+            />
             <Stack.Screen name="CreateGroup" component={CreateGroupScreen} options={{ title: 'New Group' }} />
             <Stack.Screen
               name="GroupDetail"
