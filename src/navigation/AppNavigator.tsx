@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, View, Image, Text, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,8 +25,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function HomeHeaderTitle({ colors }: { colors: ThemeColors }) {
-  const headerStyles = createHeaderStyles(colors);
+function HomeHeaderTitle({ colors, isDark }: { colors: ThemeColors; isDark: boolean }) {
+  const headerStyles = createHeaderStyles(colors, isDark);
   return (
     <View style={headerStyles.row}>
       <Image source={require('../../assets/android-icon-foreground.png')} style={headerStyles.logo} />
@@ -34,11 +35,11 @@ function HomeHeaderTitle({ colors }: { colors: ThemeColors }) {
   );
 }
 
-function createHeaderStyles(colors: ThemeColors) {
+function createHeaderStyles(colors: ThemeColors, isDark: boolean) {
   return StyleSheet.create({
     row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     logo: { width: 28, height: 28, resizeMode: 'contain' },
-    title: { color: colors.white, fontSize: 18, fontWeight: '700' },
+    title: { color: isDark ? colors.textPrimary : colors.white, fontSize: 18, fontWeight: '700' },
   });
 }
 
@@ -66,15 +67,21 @@ export default function AppNavigator() {
     );
   }
 
+  const headerBackgroundColor = isDark ? colors.surface : colors.primary;
+  const headerTintColor = isDark ? colors.textPrimary : colors.white;
+
   return (
-    <NavigationContainer theme={navTheme}>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.primary },
-          headerTintColor: colors.white,
-          headerTitleStyle: { fontWeight: '700' },
-        }}
-      >
+    <>
+      <StatusBar style="light" />
+      <NavigationContainer theme={navTheme}>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: headerBackgroundColor },
+            headerTintColor,
+            headerTitleStyle: { fontWeight: '700' },
+            headerShadowVisible: isDark ? false : true,
+          }}
+        >
         {!user || !appUser ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
@@ -86,7 +93,7 @@ export default function AppNavigator() {
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={{ headerTitle: () => <HomeHeaderTitle colors={colors} />, headerBackVisible: false }}
+              options={{ headerTitle: () => <HomeHeaderTitle colors={colors} isDark={isDark} />, headerBackVisible: false }}
             />
             <Stack.Screen name="CreateGroup" component={CreateGroupScreen} options={{ title: 'New Group' }} />
             <Stack.Screen
@@ -112,7 +119,8 @@ export default function AppNavigator() {
             <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
           </>
         )}
-      </Stack.Navigator>
-    </NavigationContainer>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
