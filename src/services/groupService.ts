@@ -10,6 +10,8 @@ import {
   where,
   serverTimestamp,
   arrayUnion,
+  arrayRemove,
+  deleteField,
   onSnapshot,
   writeBatch,
 } from 'firebase/firestore';
@@ -99,6 +101,13 @@ export async function addMemberToGroup(groupId: string, member: AppUser): Promis
   await updateDoc(doc(db, 'groups', groupId), {
     members: arrayUnion(member.id),
     [`memberDetails.${member.id}`]: member,
+  });
+}
+
+export async function removeMemberFromGroup(groupId: string, memberId: string): Promise<void> {
+  await updateDoc(doc(db, 'groups', groupId), {
+    members: arrayRemove(memberId),
+    [`memberDetails.${memberId}`]: deleteField(),
   });
 }
 

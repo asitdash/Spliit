@@ -127,6 +127,19 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
     const members = group ? (Object.values(group.memberDetails) as AppUser[]) : [];
     Alert.alert(expense.description, `${formatCurrency(expense.amount, group?.currency)}  ·  Paid by ${expense.paidByName}`, [
       {
+        text: '🧾  View Split Details',
+        onPress: () => {
+          const lines = expense.splits
+            .filter((s) => s.amount > 0)
+            .map((s) => `${s.userId === appUser?.id ? 'You' : s.userName}: ${formatCurrency(s.amount, group?.currency)}`)
+            .join('\n');
+          Alert.alert(
+            expense.description,
+            `Paid by ${expense.paidBy === appUser?.id ? 'you' : expense.paidByName}\n\n${lines}`
+          );
+        },
+      },
+      {
         text: '✏️  Edit Expense',
         onPress: () =>
           navigation.navigate('EditExpense', {
@@ -162,6 +175,24 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
   function renderExpense({ item }: { item: Expense }) {
     const myShare = item.splits.find((s) => s.userId === appUser?.id)?.amount ?? 0;
     const iPaid = item.paidBy === appUser?.id;
+    const involvedSplits = item.splits.filter((s) => s.amount > 0);
+    const splitSummary =
+      involvedSplits.length <= 1
+        ? null
+        : involvedSplits
+            .map((s) => `${s.userId === appUser?.id ? 'You' : s.userName.split(' ')[0]} ${formatCurrency(s.amount, group?.currency)}`)
+            .join('  ·  ');
+    let myLine: string;
+    if (myShare === 0) {
+      myLine = iPaid ? 'You paid, not involved in split' : 'Not involved';
+    } else if (iPaid) {
+      myLine =
+        item.amount - myShare > 0
+          ? `You lent ${formatCurrency(item.amount - myShare, group?.currency)}`
+          : 'You paid your own share';
+    } else {
+      myLine = `You owe ${formatCurrency(myShare, group?.currency)}`;
+    }
     return (
       <TouchableOpacity
         style={styles.expenseCard}
@@ -176,11 +207,16 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
           <Text style={styles.expenseMeta}>
             Paid by {iPaid ? 'you' : item.paidByName}
           </Text>
+          {splitSummary ? (
+            <Text style={styles.expenseSplitSummary} numberOfLines={1}>
+              {splitSummary}
+            </Text>
+          ) : null}
         </View>
         <View style={styles.expenseAmounts}>
           <Text style={styles.expenseTotal}>{formatCurrency(item.amount, group?.currency)}</Text>
-          <Text style={[styles.expenseShare, iPaid ? styles.textGreen : styles.textRed]}>
-            {iPaid ? `+${formatCurrency(item.amount - myShare, group?.currency)}` : `-${formatCurrency(myShare, group?.currency)}`}
+          <Text style={[styles.expenseShare, myShare === 0 ? styles.textMuted : iPaid ? styles.textGreen : styles.textRed]}>
+            {myLine}
           </Text>
           {item.receiptUrl ? (
             <TouchableOpacity
@@ -331,10 +367,10 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
 
             <TouchableOpacity style={styles.menuItem} onPress={() => {
               setShowGroupMenu(false);
-              navigation.navigate('AddMember', { groupId });
+              navigation.navigate('Members', { groupId, groupName: group.name });
             }}>
-              <Ionicons name="person-add-outline" size={22} color={colors.textPrimary} />
-              <Text style={styles.menuItemText}>Add Member</Text>
+              <Ionicons name="people-outline" size={22} color={colors.textPrimary} />
+              <Text style={styles.menuItemText}>Members</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={() => {
@@ -411,12 +447,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: spacing.md,
   },
-  expenseInfo: { flex: 1 },
+  expenseInfo: { flex: 1, marginRight: spacing.sm },
   expenseDesc: { fontSize: fontSize.md, fontWeight: '600', color: colors.textPrimary },
   expenseMeta: { fontSize: fontSize.xs, color: colors.textSecondary, marginTop: 2 },
-  expenseAmounts: { alignItems: 'flex-end' },
+  expenseSplitSummary: { fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
+  expenseAmounts: { alignItems: 'flex-end', maxWidth: 130 },
   expenseTotal: { fontSize: fontSize.sm, fontWeight: '700', color: colors.textPrimary },
-  expenseShare: { fontSize: fontSize.xs, fontWeight: '600', marginTop: 2 },
+  expenseShare: { fontSize: fontSize.xs, fontWeight: '600', marginTop: 2, textAlign: 'right' },
   textGreen: { color: colors.success },
   textRed: { color: colors.danger },
   textMuted: { color: colors.textMuted },

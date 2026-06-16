@@ -14,6 +14,7 @@ import CreateGroupScreen from '../screens/CreateGroupScreen';
 import GroupDetailScreen from '../screens/GroupDetailScreen';
 import AddExpenseScreen from '../screens/AddExpenseScreen';
 import AddMemberScreen from '../screens/AddMemberScreen';
+import GroupMembersScreen from '../screens/GroupMembersScreen';
 import SettleUpScreen from '../screens/SettleUpScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
 import EditGroupScreen from '../screens/EditGroupScreen';
@@ -59,6 +60,11 @@ export default function AppNavigator() {
             />
             <Stack.Screen name="AddExpense" component={AddExpenseScreen} options={{ title: 'Add Expense' }} />
             <Stack.Screen name="AddMember" component={AddMemberScreen} options={{ title: 'Add Member' }} />
+            <Stack.Screen
+              name="Members"
+              component={GroupMembersScreen}
+              options={({ route }) => ({ title: `${route.params.groupName} — Members` })}
+            />
             <Stack.Screen name="EditGroup" component={EditGroupScreen} options={{ title: 'Edit Group' }} />
             <Stack.Screen name="EditExpense" component={EditExpenseScreen} options={{ title: 'Edit Expense' }} />
             <Stack.Screen name="SettleUp" component={SettleUpScreen} options={{ title: 'Settle Up' }} />

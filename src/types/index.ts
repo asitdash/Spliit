@@ -59,6 +59,7 @@ export type RootStackParamList = {
   AddExpense: { groupId: string; members: AppUser[]; currency: string; groupName: string };
   EditExpense: { groupId: string; expense: Expense; members: AppUser[]; currency: string };
   AddMember: { groupId: string };
+  Members: { groupId: string; groupName: string };
   SettleUp: { groupId: string; members: AppUser[]; currency: string };
   Analytics: { groupId: string; groupName: string; currency: string };
   Profile: undefined;
