@@ -53,12 +53,17 @@ export default function HomeScreen({ navigation }: Props) {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={handleLogout} style={{ marginRight: 4 }}>
-          <Ionicons name="log-out-outline" size={24} color={colors.white} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={{ marginRight: 16 }}>
+            <Ionicons name="person-circle-outline" size={24} color={colors.white} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout} style={{ marginRight: 4 }}>
+            <Ionicons name="log-out-outline" size={24} color={colors.white} />
+          </TouchableOpacity>
+        </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, colors]);
 
   function renderGroup({ item }: { item: Group }) {
     const memberCount = item.members.length;
