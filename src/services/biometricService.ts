@@ -48,11 +48,15 @@ export async function promptBiometric(): Promise<boolean> {
 
 export async function getBiometricType(): Promise<string> {
   const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-  if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
-    return 'Face ID';
-  }
+  // Android's BiometricPrompt defaults to fingerprint when a device supports
+  // both fingerprint and face unlock, so check fingerprint first - otherwise
+  // devices that support both report "Face ID" even though the system prompt
+  // that actually appears is a fingerprint scan.
   if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
     return 'Fingerprint';
+  }
+  if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+    return 'Face ID';
   }
   return 'Biometric';
 }
