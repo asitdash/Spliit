@@ -41,6 +41,8 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
   // Keep latest group/expenses in refs so the balance recalc always uses fresh data
   const groupRef = useRef<Group | null>(null);
   const expensesRef = useRef<Expense[]>([]);
+  const unsubGroupRef = useRef<(() => void) | null>(null);
+  const unsubExpensesRef = useRef<(() => void) | null>(null);
 
   function recalc(g: Group | null, exps: Expense[]) {
     if (!g) return;
@@ -61,6 +63,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
       },
       () => Alert.alert('Error', 'Could not sync group.')
     );
+    unsubGroupRef.current = unsub;
     return unsub;
   }, [groupId]);
 
@@ -75,6 +78,7 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
       },
       () => Alert.alert('Error', 'Could not sync expenses.')
     );
+    unsubExpensesRef.current = unsub;
     return unsub;
   }, [groupId]);
 
@@ -93,6 +97,10 @@ export default function GroupDetailScreen({ navigation, route }: Props) {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
+            // Detach listeners first so they don't receive a permission
+            // error from Firestore once the group doc no longer exists.
+            unsubGroupRef.current?.();
+            unsubExpensesRef.current?.();
             try {
               await deleteGroup(groupId);
               navigation.navigate('Home');
